@@ -20,7 +20,7 @@ class ConfirmPage extends StatelessWidget {
 
   // methods
   Future<void> sendCardImage(context) async {
-    final url = Uri.parse("http://172.30.1.123:8000/users/detect_nid/");
+    final url = Uri.parse("http://192.168.1.4:8000/users/detect_nid/");
 
     // request
     print("sending request...");

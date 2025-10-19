@@ -95,7 +95,7 @@ class RegisterPageState extends State<RegisterPage> {
 
 
                 // SUBMISSION
-                SubmitFormButton(formKey: formKey, url:"http://172.30.1.123:8000/users/signup/", controller: controller),
+                SubmitFormButton(formKey: formKey, url:"http://192.168.1.4:8000/users/signup/", controller: controller),
 
               ],
             ),

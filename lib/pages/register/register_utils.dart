@@ -196,7 +196,7 @@ class CustomTextFormFieldState extends State<CustomTextFormField> {
 ////////////////////////////////////SUBMISSION FORM BUTTON///////////////////////////////////////////////////
 
 // [WIDGET]
-class SubmitFormButton extends StatelessWidget {
+class SubmitFormButton extends StatefulWidget {
 
   // INPUTS
   FormControllers controller;
@@ -206,24 +206,59 @@ class SubmitFormButton extends StatelessWidget {
   // rebuild || reuse
   SubmitFormButton({super.key, required this.formKey, required this.url, required this.controller});
 
+  // state naming
+  @override State<SubmitFormButton> createState()=> SubmitFormButtonState();
+}
+
+
+class SubmitFormButtonState extends State<SubmitFormButton> {
+
+  // VARIABLES
+  String errorMessage = "";
+
   // METHODS
   Future<void> submit() async {
 
     // validate
-    if(formKey.currentState!.validate()){
+    if(widget.formKey.currentState!.validate()){
 
       // get data
-      final data = controller.getData();
+      final data = widget.controller.getData();
       print('form data = $data');
 
       // send post request
-      final parsedUrl = Uri.parse(url);
-      final response = await http.post( parsedUrl, headers: { 'Content-Type': 'application/json' }, body: jsonEncode(data),
-);
+      print("url = ${widget.url}");
+      final parsedUrl = Uri.parse(widget.url);
+      final response = await http.post( parsedUrl, headers: { 'Content-Type': 'application/json' }, body: jsonEncode(data),);
+      final decoded  = jsonDecode(response.body);
 
-      print("resposne = $response");
+
+      print("resposne = ${response.body}");
 
       // check status
+      if(response.statusCode == 200){
+        print("hello my name is ahmed kamal");
+        setState(() { errorMessage = "";});
+      } else {
+        String msg = '';
+        if (decoded is Map<String , dynamic>){
+          // get first key
+          final firstKey = decoded.keys.first;
+          final errors =  decoded[firstKey];
+          if (errors is List && errors.isNotEmpty) {
+            msg = errors[0]; 
+          } else if (errors is String) {
+          msg = errors;
+        }
+      }
+
+      // rebuild the widget
+      setState(() {
+        errorMessage = msg;
+      });
+
+    }
+
 
     }
 
@@ -234,37 +269,49 @@ class SubmitFormButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(top: 20),
-      child:  ElevatedButton(
-        onPressed: submit, 
+      child: Column(
+      children: [
 
-        // CSS
-        style: ElevatedButton.styleFrom(
-          
-          // padding
-          padding: EdgeInsets.all(18),
+        // THE MESSAGE FROM THE BACKEND
+        Center(child: Text(errorMessage),),
 
-          // border
-          shape:  RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          
-          // color
-          backgroundColor: Colors.blue,
+        // SUBMISSION BUTTON
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+          onPressed: submit, 
 
-          // shadow
-          elevation: 0,
+          // CSS
+          style: ElevatedButton.styleFrom(
+            
+            // padding
+            padding: EdgeInsets.all(18),
 
-        ),
-
-        // CHILD
-        child: Text(
-          "انشاء حساب", 
-          style: TextStyle(
-            color: Colors.white, 
-            fontWeight: FontWeight.w900, 
-            fontSize: 16
+            // border
+            shape:  RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
+            
+            // color
+            backgroundColor: Colors.blue,
+
+            // shadow
+            elevation: 0,
+
           ),
+
+          // CHILD
+          child: Text(
+            "انشاء حساب", 
+            style: TextStyle(
+              color: Colors.white, 
+              fontWeight: FontWeight.w900, 
+              fontSize: 16
+              ),
+            ),
+        ),
+        )
+      ],
       )
     );
   }
@@ -295,7 +342,6 @@ class CameraNavigator extends StatelessWidget  {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
         if (isTxt) Text(txt!),
         if (isIcon) Icon(icon),
       ],)

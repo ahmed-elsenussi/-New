@@ -31,7 +31,7 @@ class CameraPageState extends State<CameraPage> {
   @override
   void initState() {
     super.initState();
-    cameraController = CameraController(widget.camera, ResolutionPreset.medium);
+    cameraController = CameraController(widget.camera, ResolutionPreset.ultraHigh);
     initControllerFuture = cameraController.initialize();
   }
 
@@ -73,7 +73,19 @@ class CameraPageState extends State<CameraPage> {
               children: [
 
                 // camera layer
-                SizedBox.expand(child: CameraPreview(cameraController)),
+                SizedBox.expand(
+                  child: FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: cameraController.value.previewSize?.height ?? 0,
+                      height: cameraController.value.previewSize?.width ?? 0,
+                      child: CameraPreview(cameraController),
+                    ),
+                  ),
+                ),
+
+                
+
 
                 // error message
                 if (widget.messageError != null)

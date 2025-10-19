@@ -1,9 +1,14 @@
+import 'package:card_register/pages/register/nid.dart';
 import 'package:flutter/material.dart';
 import 'package:card_register/pages/register/register_utils.dart';
 
 class RegisterPage extends StatefulWidget {
+
+  // inputs
+  final String? nid;
+
   // rebuild || reuse
-  const RegisterPage({super.key});
+  const RegisterPage({super.key, this.nid});
 
   // naming the state
   @override
@@ -13,11 +18,19 @@ class RegisterPage extends StatefulWidget {
 class RegisterPageState extends State<RegisterPage> {
   // VARIABLES
 
-  // global key : make you access state widget from anywhere in the widget tree
+  // global key : 
   final formKey = GlobalKey<FormState>();
   final controller = FormControllers();
 
   // METHODS
+  @override 
+  void initState(){
+    super.initState();
+    if(widget.nid != null ){
+      // add the nid to the controller
+      controller.setExtra("nid", widget.nid!);
+    }
+  }
 
   // BUILD
   @override
@@ -35,7 +48,8 @@ class RegisterPageState extends State<RegisterPage> {
               children: [
 
                 // camera button
-                CameraNavigator(),
+                (widget.nid != null) ? NidViewEdit(nid: widget.nid!) : CameraNavigator(txt: "التقط صورة البطاقة", icon: Icons.add,),
+                Center(child: Text("سيتم استخدام الرقم القومي للربط بالحساب فقط لاداعي للقلق", style: TextStyle(color: Colors.blue.shade500),), ),
 
                 // name
                 CustomTextFormField(
@@ -81,7 +95,7 @@ class RegisterPageState extends State<RegisterPage> {
 
 
                 // SUBMISSION
-                SubmitFormButton(formKey: formKey, url:"", controller: controller),
+                SubmitFormButton(formKey: formKey, url:"http://172.30.1.123:8000/users/signup/", controller: controller),
 
               ],
             ),

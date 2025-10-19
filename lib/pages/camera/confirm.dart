@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:card_register/pages/camera/camera.dart';
+import 'package:card_register/pages/register/register.dart';
 import 'package:card_register/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -19,19 +20,31 @@ class ConfirmPage extends StatelessWidget {
 
   // methods
   Future<void> sendCardImage(context) async {
-    final url = Uri.parse("http://192.168.1.4:8000/users/detect_nid/");
+    final url = Uri.parse("http://172.30.1.123:8000/users/detect_nid/");
 
     // request
+    print("sending request...");
     var request = http.MultipartRequest('POST', url);
     request.files.add( await http.MultipartFile.fromPath('image', imagePath));
 
     // response
+    print("getting response...");
     var response  = await request.send();
     var responseBody = await response.stream.bytesToString();
+    print("the response = ${responseBody}");
     var decoded = jsonDecode(responseBody); 
 
     // 200 ?
-    if (response.statusCode == 200) {print("Done Detect the id");}
+    if (response.statusCode == 200) {
+      print("Done Detect the id");
+
+
+       Navigator.pushAndRemoveUntil( context, 
+        MaterialPageRoute( builder: (context) => RegisterPage(nid: decoded['nid']),),
+        (Route<dynamic> route) => false, // remove all previous pages
+        );
+
+    }
     else { 
       final errorMessage = decoded['error'] ?? 'Unknown error occurred';
       Navigator.push(

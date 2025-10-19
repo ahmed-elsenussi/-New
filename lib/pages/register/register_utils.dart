@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class FormControllers {
   // CONTROLLERS
@@ -7,6 +8,7 @@ class FormControllers {
   final email = TextEditingController();
   final password = TextEditingController();
   final verifyPassword = TextEditingController();
+  Map<String, String> extra = {};
 
   // CLEAN
   void dispose() {
@@ -16,11 +18,17 @@ class FormControllers {
     verifyPassword.dispose();
   }
 
+  // SET-EXTRA DATA
+  void setExtra(String key, String value){
+    extra[key] = value;
+  }
+
   // GET-DATA
   Map<String, String> getData() => {
       "name": name.text,
       "email": email.text,
       "password":password.text,
+      ...extra,
   };
   
 }
@@ -210,7 +218,9 @@ class SubmitFormButton extends StatelessWidget {
 
       // send post request
       final parsedUrl = Uri.parse(url);
-      final response = await http.post( parsedUrl, headers: { 'Content-Type' : 'application/json'}, body: data);
+      final response = await http.post( parsedUrl, headers: { 'Content-Type': 'application/json' }, body: jsonEncode(data),
+);
+
       print("resposne = $response");
 
       // check status
@@ -263,21 +273,32 @@ class SubmitFormButton extends StatelessWidget {
 ///////////////////////////CAMERA Navigator////////////////////
 ///
 class CameraNavigator extends StatelessWidget  {
-  const CameraNavigator({super.key});
+  final String? txt;
+  final bool isTxt;
+  final IconData? icon;
+  final bool isIcon;
+
+  const CameraNavigator({super.key, this.txt, this.isTxt=true, this.icon, this.isIcon = true});
+
   @override Widget build(BuildContext context){
     return ElevatedButton(
       onPressed: ()=>Navigator.pushNamed(context, '/camera'), 
       style: ElevatedButton.styleFrom(
         // padding
-        padding: EdgeInsets.all(3),
+        padding: EdgeInsets.all(24),
         // background color
         backgroundColor: Colors.blue[100],
         // borders
-        shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10) ),
+        shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(12) ),
         // shadow
         elevation: 0,
       ),
-      child: Text("photo the ID Card", style: TextStyle(color: Colors.black),),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+        if (isTxt) Text(txt!),
+        if (isIcon) Icon(icon),
+      ],)
       );
   }
 }
